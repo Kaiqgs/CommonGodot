@@ -1,18 +1,7 @@
 [gd_scene load_steps=14 format=2]
 
-[ext_resource path="res://scenes/entity/SoundPlayer.tscn" type="PackedScene" id=1]
-[ext_resource path="res://KagsCommon/SoundPool.cs" type="Script" id=2]
-[ext_resource path="res://assets/wav/engine_starting.wav" type="AudioStream" id=3]
-[ext_resource path="res://assets/wav/engine_started.wav" type="AudioStream" id=4]
-[ext_resource path="res://assets/wav/start_loop.wav" type="AudioStream" id=5]
-[ext_resource path="res://assets/wav/rev_loop.wav" type="AudioStream" id=6]
-[ext_resource path="res://assets/wav/carHit1.wav" type="AudioStream" id=7]
-[ext_resource path="res://assets/wav/carHit4.wav" type="AudioStream" id=8]
-[ext_resource path="res://assets/wav/carHit2.wav" type="AudioStream" id=9]
-[ext_resource path="res://assets/wav/carHit3.wav" type="AudioStream" id=10]
-[ext_resource path="res://assets/wav/251461__joshuaempyre__arcade-music-loop.wav" type="AudioStream" id=11]
-[ext_resource path="res://assets/wav/bass_loop_for_score.wav" type="AudioStream" id=12]
-[ext_resource path="res://assets/wav/stage2_loop.wav" type="AudioStream" id=13]
+[ext_resource path="res://CommonGodot/v3/entities/entity/SoundPlayer.tscn" type="PackedScene" id=1]
+[ext_resource path="res://CommonGodot/v3/src/SoundPool.cs" type="Script" id=2]
 
 [node name="SoundsPool" type="Node2D"]
 script = ExtResource( 2 )
