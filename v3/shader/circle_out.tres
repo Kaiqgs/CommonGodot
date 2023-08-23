@@ -1,0 +1,18 @@
+[gd_resource type="Shader" format=2]
+
+[resource]
+code = "
+shader_type canvas_item;
+
+uniform vec2 position = vec2(0.5, 0.5);
+uniform vec4 color: hint_color = vec4(1, 1, 1, 1);
+uniform float radius = 1;
+
+void fragment() {
+	vec4 pixelColor = texture(TEXTURE, UV);
+	vec2 pos = UV - position;
+	float circle = step(radius, length(pos));
+	/* COLOR = vec4(pixelColor.rgb, 1.0); */
+	COLOR = vec4(pixelColor.rgb, circle * pixelColor.a) * color;
+}
+"

@@ -1,0 +1,35 @@
+[gd_resource type="Shader" format=2]
+
+[resource]
+code = "shader_type canvas_item;
+
+uniform float brightness = 1.0;
+uniform float contrast = 1.0;
+uniform float saturation = 1.0;
+
+// uniform float replace
+uniform vec4 mainColor: hint_color = vec4(0.2431372549019608,0.1372549019607843,0.1725490196078431, 1.0)  ;
+uniform vec4 secondaryColor: hint_color = vec4(0.9294117647058824, 0.9647058823529412, 0.8392156862745098, 1.0);
+uniform vec4 setMainColor: hint_color = vec4(0.2431372549019608,0.1372549019607843,0.1725490196078431, 1.0);
+uniform vec4 setSecondaryColor: hint_color = vec4(0.9294117647058824, 0.9647058823529412, 0.8392156862745098, 1.0);
+uniform float threshold = 0.1;
+
+void fragment() {
+    vec3 c = textureLod(SCREEN_TEXTURE, SCREEN_UV, 0.0).rgb;
+    vec3 mainDiff = abs(c - mainColor.rgb);
+    vec3 secondaryDiff = abs(c - secondaryColor.rgb);
+    if(all(lessThan(mainDiff,  vec3(threshold)))){
+	    c = setMainColor.rgb;
+    }
+    if(all(lessThan(secondaryDiff,  vec3(threshold)))){
+	    c = setSecondaryColor.rgb;
+    }
+
+    c.rgb = mix(vec3(0.0), c.rgb, brightness);
+    c.rgb = mix(vec3(0.5), c.rgb, contrast);
+    c.rgb = mix(vec3(dot(vec3(1.0), c.rgb) * 0.33333), c.rgb, saturation);
+
+    COLOR.rgb = c;
+    
+}
+"

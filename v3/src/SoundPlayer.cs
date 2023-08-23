@@ -13,7 +13,11 @@ public partial class SoundPlayer : Node2D
     [Export]
     public bool Repeat = false;
 
+    [Export]
+    public bool RandomPitch = false;
+
     private List<AudioStreamPlayer> _players = new List<AudioStreamPlayer>();
+    private List<float> _volumes = new List<float>();
     private RandomNumberGenerator _rng = new RandomNumberGenerator();
     private int _idx = 0;
 
@@ -25,6 +29,7 @@ public partial class SoundPlayer : Node2D
             if (child != null)
             {
                 _players.Add(child);
+                _volumes.Add(child.VolumeDb);
             }
         }
     }
@@ -43,6 +48,18 @@ public partial class SoundPlayer : Node2D
             idx = this._rng.RandiRange(0, lastIdx);
         }
         return idx;
+    }
+
+    public bool IsPlaying()
+    {
+        foreach (var player in _players)
+        {
+            if (player.Playing)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void Play(float delay = 0)
@@ -68,16 +85,36 @@ public partial class SoundPlayer : Node2D
 
         var idx = this._idx = this.GetPlayIndex();
         var player = _players[idx];
+        if (this.RandomPitch)
+        {
+            player.PitchScale = this._rng.RandfRange(0.9f, 1.1f);
+        }
         player.Play();
         _players.RemoveAt(idx);
         _players.Add(player);
     }
 
+    public float MaxVolume = 0f; // 72f;
+    public float MinVolume = -80f;
+
     public void SetVolume(float volume)
     {
-        foreach (var player in _players)
+        // float unitVolume = (volume) / (72f + 80f);
+        for (int i = 0; i < _players.Count; ++i)
         {
-            player.VolumeDb = volume;
+            var originalVolume = _volumes[i];
+            var unitVolume = MathUtil.Map(volume, MinVolume, MaxVolume, 0f, 1f);
+            var originalUnit = MathUtil.Map(originalVolume, MinVolume, MaxVolume, 0f, 1f);
+
+            var resultingVolume = unitVolume * originalUnit;
+            var mappedVolume = MathUtil.Map(resultingVolume, 0f, 1f, MinVolume, MaxVolume);
+
+            // GD.Print($"originalVolume: {originalVolume}");
+            // GD.Print($"volume: {unitVolume}");
+            // GD.Print($"resultingVolume: {unitVolume}");
+            // GD.Print($"mappedVolume: {mappedVolume}");
+            var player = _players[i];
+            player.VolumeDb = mappedVolume;
         }
     }
 

@@ -2,7 +2,7 @@
 
 [ext_resource path="res://CommonGodot/v3/src/Transitioner.cs" type="Script" id=1]
 
-[node name="Timer" type="Timer"]
+[node name="Scheduler" type="Timer"]
+script = ExtResource( 1 )
 
 [node name="Transitioner" type="Node2D" parent="."]
-script = ExtResource( 1 )

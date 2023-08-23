@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[ext_resource path="res://assets/shading/vignette_dithered.tres" type="Shader" id=1]
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/player_position = Vector2( 0.5, 0.5 )
+shader_param/color = Color( 0.929412, 0.964706, 0.839216, 1 )
+shader_param/MULTIPLIER = 1.173
+shader_param/SCALE = 0.224
+shader_param/SOFTNESS = 6.769
+shader_param/invert = true
+shader_param/TimeScale = 1.0

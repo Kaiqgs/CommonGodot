@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[ext_resource path="res://assets/shading/screen_shader.tres" type="Shader" id=1]
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/brightness = 1.0
+shader_param/contrast = 1.0
+shader_param/saturation = 1.0
+shader_param/mainColor = Color( 0.243137, 0.137255, 0.172549, 1 )
+shader_param/secondaryColor = Color( 0.929412, 0.964706, 0.839216, 1 )
+shader_param/setMainColor = Color( 0.243137, 0.137255, 0.172549, 1 )
+shader_param/setSecondaryColor = Color( 0.929412, 0.964706, 0.839216, 1 )
+shader_param/threshold = 0.1

@@ -32,14 +32,26 @@ public partial class Transitioner : Timer
 {
     public KinematicBody2D Target { get; set; }
 
+    public Vector2? GoalPosition { get; set; }
+
     [Export]
     public ShaderMaterial _shaderMaterial;
 
     [Signal]
     public delegate void FinishedRoutine();
 
+    [Export]
+    public float CompleteDelayTime = 3f;
+
+    [Export]
+    public float CompleteFirstStepTime = 2f;
+
+    [Export]
+    public float CompleteSecondStepTime = 2f;
+
     private List<CircleAnimation> _routines;
     private CircleAnimation _currentRoutine;
+    private bool _lastRoutine = false;
 
     public override void _Ready()
     {
@@ -50,10 +62,12 @@ public partial class Transitioner : Timer
                 InitialRadius = 0f,
                 FinalRadius = .56f,
                 Duration = 2f,
-                EaseFunction = Kryz.Tweening.EasingFunctions.InOutQuad
+                EaseFunction = EasingFunctions.InOutQuad
             },
         };
 
+        GoalPosition = Vector2.One / 2;
+        this.OneShot = true;
         this.Connect("timeout", this, nameof(_onTimerTimeout));
     }
 
@@ -81,7 +95,7 @@ public partial class Transitioner : Timer
         var interpolated = Mathf.Lerp(
             this._currentRoutine.InitialRadius,
             this._currentRoutine.FinalRadius,
-	    this._currentRoutine.EaseFunction((float)elapsedTime)
+            this._currentRoutine.EaseFunction((float)elapsedTime)
         );
         // var interpolated = Tween.InterpolateValue(
         //     this._currentRoutine.InitialRadius,
@@ -100,20 +114,19 @@ public partial class Transitioner : Timer
         //In
         // GD.Print("elapsedTime: ", elapsedTime, " value: ", _value);
 
-        Vector2 targetPos;
         if (this.Target != null)
         {
             var transf = this.Target.GetGlobalTransformWithCanvas();
-            targetPos = transf.origin / GetViewport().Size;
-            // targetPos = transf.Origin / rect.Size;
-            // GD.Print(transf);
-            targetPos.y -= .175f;
+            Vector2 pos = transf.origin / GetViewport().Size;
+            pos.y -= .175f;
+            GoalPosition = pos;
         }
-        else
+
+        if (GoalPosition.HasValue)
         {
-            targetPos = Vector2.One / 2;
+            var targetPos = (Vector2)GoalPosition;
+            this.SetState((float)_value, targetPos);
         }
-        this.SetState((float)_value, targetPos);
     }
 
     public void SetState(float radius, Vector2? position)
@@ -128,43 +141,60 @@ public partial class Transitioner : Timer
 
     public void OnCompletion(string name)
     {
+        if(this._lastRoutine){
+            GD.Print("OnCompletion duplicate avoided");
+            return;
+        }
+
         GD.Print("OnCompletion transition");
         this._routines.Add(
             new CircleAnimation
             {
-                Duration = .5f,
+                Duration = CompleteDelayTime,
                 InitialRadius = 1f,
                 FinalRadius = .1f,
-                EaseFunction = Kryz.Tweening.EasingFunctions.OutQuint
+                EaseFunction = EasingFunctions.OutQuint
             }
         );
         this._routines.Add(
             new CircleAnimation
             {
-                Duration = 1f,
+                Duration = CompleteFirstStepTime,
                 InitialRadius = .1f,
                 FinalRadius = 0f,
-                EaseFunction = Kryz.Tweening.EasingFunctions.InElastic
+                EaseFunction = EasingFunctions.InElastic
             }
         );
         this._routines.Add(
             new CircleAnimation
             {
-                Duration = 1.5f,
+                Duration = CompleteSecondStepTime,
                 InitialRadius = 0f,
                 FinalRadius = 0f,
-                EaseFunction = Kryz.Tweening.EasingFunctions.Linear,
+                EaseFunction = EasingFunctions.Linear,
             }
         );
+        this._lastRoutine = true;
     }
 
     private void _onTimerTimeout()
     {
-        this.SetState((float)_currentRoutine.FinalRadius, null);
-        _currentRoutine = null;
-        if (_routines.Count <= 0)
+        try
         {
-            EmitSignal("FinishedRoutine");
+            if (this._currentRoutine == null)
+            {
+                return;
+            }
+            this.SetState((float)_currentRoutine.FinalRadius, null);
+            _currentRoutine = null;
+            if (_routines.Count <= 0)
+            {
+                EmitSignal("FinishedRoutine");
+            }
+        }
+        catch (Exception e)
+        {
+            GD.PushError(e.ToString());
         }
     }
 }
